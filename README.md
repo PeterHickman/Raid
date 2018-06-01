@@ -5,3 +5,5 @@ I saw this really cool idea called `maid`, a Rake like tool that uses Markdown f
 It uses `npm` to install. Not wanting to install a bazzilion unverified dependencies I asked myself "How hard can this be?"
 
 So here we are then
+
+Requires a lot more work but I will pick on it from time to time
