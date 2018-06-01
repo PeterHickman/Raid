@@ -1,0 +1,104 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+
+# Inspired by https://github.com/egoist/maid
+
+RAIDFILE='Raidfile.md'
+FILENAME='/tmp/raid_workfile'
+
+def parse_markdown(text)
+  tasks = {}
+  current_task = nil
+  current_source = nil
+
+  text.split("\n").each do |line|
+    line = line.chomp
+
+    if line.index('## ') == 0
+      x = line.split(/\s+/, 2).last
+
+      x = x.downcase
+      if tasks.key?(x)
+        puts "We have already defined [#{x}]"
+      else
+        # Check last task
+        tasks[x] = { description: [], source: nil, block: [] }
+        current_task = x
+        current_source = nil
+      end
+    elsif line.index('> ') == 0
+      tasks[current_task][:description] << line.split(/\s+/, 2).last
+    elsif line.index('```') == 0
+      if current_source
+        current_source = nil
+      else
+        current_source = line[3..-1]
+        tasks[current_task][:source] = current_source
+      end
+    else
+      if current_source
+        tasks[current_task][:block] << line
+      end
+    end
+  end
+
+  tasks
+end
+
+def format_blocks(tasks)
+  tasks.each do |task, data|
+    case data[:source]
+    when 'bash', 'sh'
+      data[:block] = assemble('#!/bin/sh', data[:block])
+    when 'ruby'
+      data[:block] = assemble('#!/usr/bin/env ruby', data[:block])
+    when 'js', 'javascript'
+      data[:block] = assemble('#!/usr/bin/env js', data[:block])
+    else
+      puts "Error: Unknown source [#{data[:source]}] for task [#{task}]"
+      exit(1)
+    end
+  end
+end
+
+def assemble(shebang, lines)
+  t = []
+  t << shebang
+  lines.each do |line|
+    t << line
+  end
+  t.join("\n")
+end
+
+def execute(task)
+  filename = "#{FILENAME}.#{Process.pid}"
+
+  begin
+    fh = File.open(filename, 'w')
+    fh.puts task[:block]
+    fh.close
+
+    File.chmod(0744, filename)
+    system(filename)
+  ensure
+    File.delete(filename)
+  end
+end
+
+if File.exist?(RAIDFILE)
+  a = open(RAIDFILE).read
+else
+  puts "Unable to find #{RAIDFILE}"
+  exit 1
+end
+
+tasks = parse_markdown(a)
+format_blocks(tasks)
+
+requested_task = ARGV[0].downcase
+
+if tasks.key?(requested_task)
+  execute(tasks[requested_task])
+else
+  puts "Unknown task [#{requested_task}]"
+end
