@@ -7,3 +7,7 @@ It uses `npm` to install. Not wanting to install a bazzilion unverified dependen
 So here we are then
 
 Requires a lot more work but I will pick on it from time to time
+
+# TODO
+
+0. Document stuff
