@@ -47,6 +47,8 @@ end
 
 def format_blocks(tasks)
   tasks.each do |task, data|
+    data[:description] = data[:description].join(' ').gsub(/\s+/, ' ')
+
     case data[:source]
     when 'bash', 'sh'
       data[:block] = assemble('#!/bin/sh', data[:block])
@@ -95,9 +97,15 @@ end
 tasks = parse_markdown(a)
 format_blocks(tasks)
 
-requested_task = ARGV[0].downcase
+requested_task = ARGV[0]
 
-if tasks.key?(requested_task)
+requested_task = requested_task.downcase if requested_task
+
+if requested_task.nil?
+  tasks.each do |name, data|
+    puts "raid %-10s # %s" % [name, data[:description]]
+  end
+elsif tasks.key?(requested_task)
   execute(tasks[requested_task])
 else
   puts "Unknown task [#{requested_task}]"
