@@ -72,7 +72,7 @@ def assemble(shebang, lines)
   t.join("\n")
 end
 
-def execute(task)
+def execute(task, arguments)
   filename = "#{FILENAME}.#{Process.pid}"
 
   begin
@@ -81,7 +81,7 @@ def execute(task)
     fh.close
 
     File.chmod(0744, filename)
-    system(filename)
+    system("#{filename} #{arguments.join(' ')}")
   ensure
     File.delete(filename)
   end
@@ -97,7 +97,7 @@ end
 tasks = parse_markdown(a)
 format_blocks(tasks)
 
-requested_task = ARGV[0]
+requested_task = ARGV.shift
 
 requested_task = requested_task.downcase if requested_task
 
@@ -106,7 +106,7 @@ if requested_task.nil?
     puts "raid %-10s # %s" % [name, data[:description]]
   end
 elsif tasks.key?(requested_task)
-  execute(tasks[requested_task])
+  execute(tasks[requested_task], ARGV)
 else
   puts "Unknown task [#{requested_task}]"
 end
