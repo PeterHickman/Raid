@@ -11,3 +11,4 @@ Requires a lot more work but I will pick on it from time to time
 # TODO
 
 0. Pass arguments to the tasks
+0. Document stuff
