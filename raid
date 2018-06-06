@@ -7,17 +7,22 @@ RAIDFILE='Raidfile.md'
 FILENAME='/tmp/raid_workfile'
 
 signatures = {
-  'bash' => '#!/bin/sh',
-  'ruby' => '#!/usr/bin/env ruby',
-  'js'   => '#!/usr/bin/env js'
+  'bash'       => '#!/bin/sh',
+  'sh'         => '#!/bin/sh',
+  'ruby'       => '#!/usr/bin/env ruby',
+  'js'         => '#!/usr/bin/env js',
+  'javascript' => '#!/usr/bin/env js'
 }
 
-def parse_markdown(text)
+def parse_markdown(text, signatures)
   tasks = {}
   current_task = nil
   current_source = nil
+  line_number = 0
 
   text.split("\n").each do |line|
+    line_number += 1
+
     line = line.chomp
 
     if line.index('## ') == 0
@@ -39,7 +44,12 @@ def parse_markdown(text)
         current_source = nil
       else
         current_source = line[3..-1]
-        tasks[current_task][:source] = current_source
+        if signatures.key?(current_source)
+          tasks[current_task][:source] = current_source
+        else
+          puts "Error: [#{current_source}] is an unrecognised source on line #{line_number}"
+          exit(1)
+        end
       end
     else
       if current_source
@@ -54,18 +64,7 @@ end
 def format_blocks(tasks, signatures)
   tasks.each do |task, data|
     data[:description] = data[:description].join(' ').gsub(/\s+/, ' ')
-
-    case data[:source]
-    when 'bash', 'sh'
-      data[:block] = assemble(signatures['bash'], data[:block])
-    when 'ruby'
-      data[:block] = assemble(signatures['ruby'], data[:block])
-    when 'js', 'javascript'
-      data[:block] = assemble(signatures['js'], data[:block])
-    else
-      puts "Error: Unknown source [#{data[:source]}] for task [#{task}]"
-      exit(1)
-    end
+    data[:block] = assemble(signatures[data[:source]], data[:block])
   end
 end
 
@@ -100,7 +99,7 @@ else
   exit 1
 end
 
-tasks = parse_markdown(a)
+tasks = parse_markdown(a, signatures)
 format_blocks(tasks, signatures)
 
 requested_task = ARGV.shift
