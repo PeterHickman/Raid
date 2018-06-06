@@ -6,6 +6,12 @@
 RAIDFILE='Raidfile.md'
 FILENAME='/tmp/raid_workfile'
 
+signatures = {
+  'bash' => '#!/bin/sh',
+  'ruby' => '#!/usr/bin/env ruby',
+  'js'   => '#!/usr/bin/env js'
+}
+
 def parse_markdown(text)
   tasks = {}
   current_task = nil
@@ -45,17 +51,17 @@ def parse_markdown(text)
   tasks
 end
 
-def format_blocks(tasks)
+def format_blocks(tasks, signatures)
   tasks.each do |task, data|
     data[:description] = data[:description].join(' ').gsub(/\s+/, ' ')
 
     case data[:source]
     when 'bash', 'sh'
-      data[:block] = assemble('#!/bin/sh', data[:block])
+      data[:block] = assemble(signatures['bash'], data[:block])
     when 'ruby'
-      data[:block] = assemble('#!/usr/bin/env ruby', data[:block])
+      data[:block] = assemble(signatures['ruby'], data[:block])
     when 'js', 'javascript'
-      data[:block] = assemble('#!/usr/bin/env js', data[:block])
+      data[:block] = assemble(signatures['js'], data[:block])
     else
       puts "Error: Unknown source [#{data[:source]}] for task [#{task}]"
       exit(1)
@@ -95,7 +101,7 @@ else
 end
 
 tasks = parse_markdown(a)
-format_blocks(tasks)
+format_blocks(tasks, signatures)
 
 requested_task = ARGV.shift
 
