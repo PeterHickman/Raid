@@ -5,14 +5,28 @@
 
 RAIDFILE='Raidfile.md'
 FILENAME='/tmp/raid_workfile'
+SIGFILE='~/.raid_signatures'
 
 signatures = {
-  'bash'       => '#!/bin/sh',
-  'sh'         => '#!/bin/sh',
-  'ruby'       => '#!/usr/bin/env ruby',
-  'js'         => '#!/usr/bin/env js',
-  'javascript' => '#!/usr/bin/env js'
+  'bash'       => { 'shbang' => '#!/bin/sh',           'source' => 'default' },
+  'sh'         => { 'shbang' => '#!/bin/sh',           'source' => 'default' },
+  'ruby'       => { 'shbang' => '#!/usr/bin/env ruby', 'source' => 'default' },
+  'js'         => { 'shbang' => '#!/usr/bin/env js',   'source' => 'default' },
+  'javascript' => { 'shbang' => '#!/usr/bin/env js',   'source' => 'default' },
 }
+
+def update_signatures(signatures)
+  s = File.expand_path(SIGFILE)
+
+  if File.exist?(s)
+    File.open(s, 'r').each do |line|
+      sig, shbang = line.chomp.split(/\s+/, 2)
+      signatures[sig.downcase] = { 'shbang' => shbang, 'source' => SIGFILE }
+    end
+  end
+
+  signatures
+end
 
 def parse_markdown(text, signatures)
   tasks = {}
@@ -64,13 +78,13 @@ end
 def format_blocks(tasks, signatures)
   tasks.each do |task, data|
     data[:description] = data[:description].join(' ').gsub(/\s+/, ' ')
-    data[:block] = assemble(signatures[data[:source]], data[:block])
+    data[:block] = assemble(signatures[data[:source]]['shbang'], data[:block])
   end
 end
 
-def assemble(shebang, lines)
+def assemble(shbang, lines)
   t = []
-  t << shebang
+  t << shbang
   lines.each do |line|
     t << line
   end
@@ -99,6 +113,8 @@ else
   exit 1
 end
 
+signatures = update_signatures(signatures)
+
 tasks = parse_markdown(a, signatures)
 format_blocks(tasks, signatures)
 
@@ -109,6 +125,17 @@ requested_task = requested_task.downcase if requested_task
 if requested_task.nil?
   tasks.each do |name, data|
     puts "raid %-10s # %s" % [name, data[:description]]
+  end
+elsif requested_task == '-s'
+  puts 'Current signatures'
+  puts '=================='
+
+  keys = signatures.keys.sort
+
+  puts "%-15s %-30s %s" % ['source', 'shbang','loaded from']
+  puts "--------------- ------------------------------ ---------------"
+  keys.each do |k|
+    puts "%-15s %-30s %s" % [k, signatures[k]['shbang'], signatures[k]['source']]
   end
 elsif tasks.key?(requested_task)
   execute(tasks[requested_task], ARGV)
