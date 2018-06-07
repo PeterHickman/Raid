@@ -7,6 +7,8 @@ RAIDFILE='Raidfile.md'
 FILENAME='/tmp/raid_workfile'
 SIGFILE='~/.raid_signatures'
 
+signatures_found = false
+
 signatures = {
   'bash'       => { 'shbang' => '#!/bin/sh',           'source' => 'default' },
   'sh'         => { 'shbang' => '#!/bin/sh',           'source' => 'default' },
@@ -19,6 +21,8 @@ def update_signatures(signatures)
   s = File.expand_path(SIGFILE)
 
   if File.exist?(s)
+    signatures_found = true
+
     File.open(s, 'r').each do |line|
       sig, shbang = line.chomp.split(/\s+/, 2)
       signatures[sig.downcase] = { 'shbang' => shbang, 'source' => SIGFILE }
@@ -122,9 +126,23 @@ requested_task = ARGV.shift
 requested_task = requested_task.downcase if requested_task
 
 if requested_task.nil?
+  puts "raid %-10s # %s" % ['-c', 'Show configuration']
   puts "raid %-10s # %s" % ['-s', 'List all the recognised sources and shbangs']
+  puts
   tasks.each do |name, data|
     puts "raid %-10s # %s" % [name, data['description']]
+  end
+elsif requested_task == '-c'
+  if File.exists?(RAIDFILE)
+    puts "#{RAIDFILE} found"
+  else
+    puts "#{RAIDFILE} not in current directory"
+  end
+
+  if signatures_found
+    puts "#{SIGFILE} found"
+  else
+    puts "#{SIGFILE} not found"
   end
 elsif requested_task == '-s'
   puts 'Current signatures'
