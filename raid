@@ -46,20 +46,19 @@ def parse_markdown(text, signatures)
       if tasks.key?(x)
         puts "We have already defined [#{x}]"
       else
-        # Check last task
-        tasks[x] = { description: [], source: nil, block: [] }
+        tasks[x] = { 'description' => [], 'source' => nil, 'block' => [] }
         current_task = x
         current_source = nil
       end
     elsif line.index('> ') == 0
-      tasks[current_task][:description] << line.split(/\s+/, 2).last
+      tasks[current_task]['description'] << line.split(/\s+/, 2).last
     elsif line.index('```') == 0
       if current_source
         current_source = nil
       else
         current_source = line[3..-1]
         if signatures.key?(current_source)
-          tasks[current_task][:source] = current_source
+          tasks[current_task]['source'] = current_source
         else
           puts "Error: [#{current_source}] is an unrecognised source on line #{line_number}"
           exit(1)
@@ -67,7 +66,7 @@ def parse_markdown(text, signatures)
       end
     else
       if current_source
-        tasks[current_task][:block] << line
+        tasks[current_task]['block'] << line
       end
     end
   end
@@ -77,8 +76,8 @@ end
 
 def format_blocks(tasks, signatures)
   tasks.each do |task, data|
-    data[:description] = data[:description].join(' ').gsub(/\s+/, ' ')
-    data[:block] = assemble(signatures[data[:source]]['shbang'], data[:block])
+    data['description'] = data['description'].join(' ').gsub(/\s+/, ' ')
+    data['block'] = assemble(signatures[data['source']]['shbang'], data['block'])
   end
 end
 
@@ -96,7 +95,7 @@ def execute(task, arguments)
 
   begin
     fh = File.open(filename, 'w')
-    fh.puts task[:block]
+    fh.puts task['block']
     fh.close
 
     File.chmod(0744, filename)
@@ -123,8 +122,9 @@ requested_task = ARGV.shift
 requested_task = requested_task.downcase if requested_task
 
 if requested_task.nil?
+  puts "raid %-10s # %s" % ['-s', 'List all the recognised sources and shbangs']
   tasks.each do |name, data|
-    puts "raid %-10s # %s" % [name, data[:description]]
+    puts "raid %-10s # %s" % [name, data['description']]
   end
 elsif requested_task == '-s'
   puts 'Current signatures'
