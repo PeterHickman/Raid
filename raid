@@ -128,6 +128,19 @@ if requested_task == '-c'
   end
 
   exit(0)
+elsif requested_task == '-s'
+  puts 'Current signatures'
+  puts '=================='
+
+  keys = signatures.keys.sort
+
+  puts "%-15s %-30s %s" % ['source', 'shbang','loaded from']
+  puts "--------------- ------------------------------ ---------------"
+  keys.each do |k|
+    puts "%-15s %-30s %s" % [k, signatures[k]['shbang'], signatures[k]['source']]
+  end
+
+  exit(0)
 end
 
 if File.exist?(RAIDFILE)
@@ -146,17 +159,6 @@ if requested_task.nil?
   puts
   tasks.each do |name, data|
     puts "raid %-10s # %s" % [name, data['description']]
-  end
-elsif requested_task == '-s'
-  puts 'Current signatures'
-  puts '=================='
-
-  keys = signatures.keys.sort
-
-  puts "%-15s %-30s %s" % ['source', 'shbang','loaded from']
-  puts "--------------- ------------------------------ ---------------"
-  keys.each do |k|
-    puts "%-15s %-30s %s" % [k, signatures[k]['shbang'], signatures[k]['source']]
   end
 elsif tasks.key?(requested_task)
   execute(tasks[requested_task], ARGV)
