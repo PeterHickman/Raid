@@ -109,30 +109,12 @@ def execute(task, arguments)
   end
 end
 
-if File.exist?(RAIDFILE)
-  a = open(RAIDFILE).read
-else
-  puts "Unable to find #{RAIDFILE}"
-  exit 1
-end
-
 signatures = update_signatures(signatures)
 
-tasks = parse_markdown(a, signatures)
-format_blocks(tasks, signatures)
-
 requested_task = ARGV.shift
-
 requested_task = requested_task.downcase if requested_task
 
-if requested_task.nil?
-  puts "raid %-10s # %s" % ['-c', 'Show configuration']
-  puts "raid %-10s # %s" % ['-s', 'List all the recognised sources and shbangs']
-  puts
-  tasks.each do |name, data|
-    puts "raid %-10s # %s" % [name, data['description']]
-  end
-elsif requested_task == '-c'
+if requested_task == '-c'
   if File.exists?(RAIDFILE)
     puts "#{RAIDFILE} found"
   else
@@ -143,6 +125,27 @@ elsif requested_task == '-c'
     puts "#{SIGFILE} found"
   else
     puts "#{SIGFILE} not found"
+  end
+
+  exit(0)
+end
+
+if File.exist?(RAIDFILE)
+  a = open(RAIDFILE).read
+else
+  puts "Unable to find #{RAIDFILE}"
+  exit 1
+end
+
+tasks = parse_markdown(a, signatures)
+format_blocks(tasks, signatures)
+
+if requested_task.nil?
+  puts "raid %-10s # %s" % ['-c', 'Show configuration']
+  puts "raid %-10s # %s" % ['-s', 'List all the recognised sources and shbangs']
+  puts
+  tasks.each do |name, data|
+    puts "raid %-10s # %s" % [name, data['description']]
   end
 elsif requested_task == '-s'
   puts 'Current signatures'
