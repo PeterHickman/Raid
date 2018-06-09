@@ -7,8 +7,6 @@ RAIDFILE='Raidfile.md'
 FILENAME='/tmp/raid_workfile'
 SIGFILE='~/.raid_signatures'
 
-signatures_found = false
-
 signatures = {
   'bash'       => { 'shbang' => '#!/bin/sh',           'source' => 'default' },
   'sh'         => { 'shbang' => '#!/bin/sh',           'source' => 'default' },
@@ -18,6 +16,8 @@ signatures = {
 }
 
 def update_signatures(signatures)
+  signatures_found = false
+
   s = File.expand_path(SIGFILE)
 
   if File.exist?(s)
@@ -29,7 +29,7 @@ def update_signatures(signatures)
     end
   end
 
-  signatures
+  return signatures_found, signatures
 end
 
 def parse_markdown(text, signatures)
@@ -109,7 +109,7 @@ def execute(task, arguments)
   end
 end
 
-signatures = update_signatures(signatures)
+signatures_found, signatures = update_signatures(signatures)
 
 requested_task = ARGV.shift
 requested_task = requested_task.downcase if requested_task
