@@ -4,7 +4,7 @@ This file documents the various tasks that I find useful (for demonstrating how 
 
 Note that the level one heading above and this plain text are being ignored. Allowing you to add documentation for the tasks within the file
 
-> This quote is ignored because there is no preceeding level two heading
+> This quote is ignored because there is no preceding level two heading
 
 And this will also be ignored
 
