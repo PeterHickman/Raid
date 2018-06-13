@@ -4,7 +4,7 @@ I saw this really cool idea called `maid`, a Rake like tool that uses Markdown f
 
 It uses `npm` to install. Not wanting to install a bazzilion unverified dependencies I asked myself "How hard can this be?"
 
-So here we are
+And here we are
 
 ## Purpose
 
@@ -63,6 +63,24 @@ Which will add the python signature to the list of known signatures:
 	ruby            #!/usr/bin/env ruby            default
 	sh              #!/bin/sh                      default
 
-# TODO
+# NAQ - Never asked questions
 
-0. Document stuff
+### About the name `raid`
+
+Well the inspiration was called `maid` and I wrote this in Ruby so it got called `raid`. It was easier than thinking of a new name, I'm lazy like that
+
+### No I mean `raid` is already a computer term
+
+Yeah I know but surprisingly `raid` isn't a CLI command. I did at least check that out. Neither my Mac nor the various Ubuntu servers I manage have this as a command and since I am writing this for my own convenience thats good enough for me
+
+### It's not that much like `maid` though
+
+`maid` does a lot more. It has some really interesting features but the one that struck me was the use of Markdown as the file format to document the various tasks. That alone was a stroke of genius. Also being a Ruby programmer I saw it as a more flexible tool than Rake which us Ruby people use quite a lot. `maid` inspired a solution for the problems I faced with lots of one line scripts that I need. Once the problem was solved I moved on
+
+But I recommend you check out `maid` at https://github.com/egoist/maid for yourself. It might be just what you need
+
+### Not the fastest thing is it
+
+Well we have a Ruby script parse a markdown file to create a temporary file that it then shells out to execute. So no, it's not built for speed. But it is convenient enough for me
+
+It's my itch and this is how I scratch it :)
