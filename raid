@@ -94,18 +94,22 @@ def assemble(shbang, lines)
   t.join("\n")
 end
 
-def execute(task, arguments)
+def execute(task, arguments, fakeit)
   filename = "#{FILENAME}.#{Process.pid}"
 
-  begin
-    fh = File.open(filename, 'w')
-    fh.puts task['block']
-    fh.close
+  if fakeit
+    puts task['block']
+  else
+    begin
+      fh = File.open(filename, 'w')
+      fh.puts task['block']
+      fh.close
 
-    File.chmod(0744, filename)
-    system("#{filename} #{arguments.join(' ')}")
-  ensure
-    File.delete(filename)
+      File.chmod(0744, filename)
+      system("#{filename} #{arguments.join(' ')}")
+    ensure
+      File.delete(filename)
+    end
   end
 end
 
@@ -113,6 +117,8 @@ signatures = update_signatures(signatures)
 
 requested_task = ARGV.shift
 requested_task = requested_task.downcase if requested_task
+
+fake_run = false
 
 if requested_task == '-c'
   if File.exists?(RAIDFILE)
@@ -141,6 +147,11 @@ elsif requested_task == '-s'
   end
 
   exit(0)
+elsif requested_task == '-n'
+  fake_run = true
+
+  requested_task = ARGV.shift
+  requested_task = requested_task.downcase if requested_task
 end
 
 if File.exist?(RAIDFILE)
@@ -161,7 +172,7 @@ if requested_task.nil?
     puts "raid %-10s # %s" % [name, data['description']]
   end
 elsif tasks.key?(requested_task)
-  execute(tasks[requested_task], ARGV)
+  execute(tasks[requested_task], ARGV, fake_run)
 else
   puts "Unknown task [#{requested_task}]"
 end
