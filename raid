@@ -7,8 +7,6 @@ RAIDFILE='Raidfile.md'
 FILENAME='/tmp/raid_workfile'
 SIGFILE='~/.raid_signatures'
 
-signatures_found = false
-
 signatures = {
   'bash'       => { 'shbang' => '#!/bin/sh',           'source' => 'default' },
   'sh'         => { 'shbang' => '#!/bin/sh',           'source' => 'default' },
@@ -18,6 +16,8 @@ signatures = {
 }
 
 def update_signatures(signatures)
+  signatures_found = false
+
   s = File.expand_path(SIGFILE)
 
   if File.exist?(s)
@@ -29,7 +29,7 @@ def update_signatures(signatures)
     end
   end
 
-  signatures
+  return signatures_found, signatures
 end
 
 def parse_markdown(text, signatures)
@@ -54,15 +54,20 @@ def parse_markdown(text, signatures)
         current_task = x
         current_source = nil
       end
-    elsif line.index('> ') == 0
+    elsif line.index('> ') == 0 && current_task
       tasks[current_task]['description'] << line.split(/\s+/, 2).last
-    elsif line.index('```') == 0
+    elsif line.index('```') == 0 && current_task
       if current_source
         current_source = nil
       else
-        current_source = line[3..-1]
+        current_source = line[3..-1].strip
         if signatures.key?(current_source)
-          tasks[current_task]['source'] = current_source
+          if tasks[current_task]['source'].nil?
+            tasks[current_task]['source'] = current_source
+          elsif tasks[current_task]['source'] != current_source
+            puts "Error: Changing the source of a task from [#{tasks[current_task]['source']}] to [#{current_source}] on line #{line_number}"
+            exit(1)
+          end
         else
           puts "Error: [#{current_source}] is an unrecognised source on line #{line_number}"
           exit(1)
@@ -113,7 +118,7 @@ def execute(task, arguments, fakeit)
   end
 end
 
-signatures = update_signatures(signatures)
+signatures_found, signatures = update_signatures(signatures)
 
 requested_task = ARGV.shift
 requested_task = requested_task.downcase if requested_task
