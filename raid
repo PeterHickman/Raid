@@ -123,7 +123,7 @@ signatures_found, signatures = update_signatures(signatures)
 requested_task = ARGV.shift
 requested_task = requested_task.downcase if requested_task
 
-fake_run = false
+fakeit = false
 
 if requested_task == '-c'
   if File.exists?(RAIDFILE)
@@ -153,7 +153,7 @@ elsif requested_task == '-s'
 
   exit(0)
 elsif requested_task == '-n'
-  fake_run = true
+  fakeit = true
 
   requested_task = ARGV.shift
   requested_task = requested_task.downcase if requested_task
@@ -171,13 +171,14 @@ format_blocks(tasks, signatures)
 
 if requested_task.nil?
   puts "raid %-10s # %s" % ['-c', 'Show configuration']
+  puts "raid %-10s # %s" % ['-n ...', 'Show the actions that command would take']
   puts "raid %-10s # %s" % ['-s', 'List all the recognised sources and shbangs']
   puts
   tasks.each do |name, data|
     puts "raid %-10s # %s" % [name, data['description']]
   end
 elsif tasks.key?(requested_task)
-  execute(tasks[requested_task], ARGV, fake_run)
+  execute(tasks[requested_task], ARGV, fakeit)
 else
   puts "Unknown task [#{requested_task}]"
 end
