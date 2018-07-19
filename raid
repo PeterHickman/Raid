@@ -174,8 +174,8 @@ if requested_task.nil?
   puts "raid %-10s # %s" % ['-n ...', 'Show the actions that command would take']
   puts "raid %-10s # %s" % ['-s', 'List all the recognised sources and shbangs']
   puts
-  tasks.each do |name, data|
-    puts "raid %-10s # %s" % [name, data['description']]
+  tasks.keys.sort.each do |name|
+    puts "raid %-10s # %s" % [name, tasks[name]['description']]
   end
 elsif tasks.key?(requested_task)
   execute(tasks[requested_task], ARGV, fakeit)
