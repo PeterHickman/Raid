@@ -16,10 +16,10 @@ By putting these all in a `Raidfile.md` I can replace all my small scripts with 
 	raid -c         # Show configuration
 	raid -s         # List all the recognised sources and shbangs
 	
-	raid hello      # A programming classic in Ruby
-	raid df         # What free space do we have on /
 	raid add        # Add some numbers in javascript
+	raid df         # What free space do we have on /
 	raid echo       # Try and echo the command line arguments
+	raid hello      # A programming classic in Ruby
 
 ## The `Raidfile.md`
 
