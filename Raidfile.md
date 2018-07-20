@@ -42,7 +42,7 @@ var b = 13;
 And then define the rest here. Note that we have to restate the source, `js`, and the application will error if it changes
 
 ```js
-print(12 + 13)
+print(a + b)
 ```
 
 ## echo
