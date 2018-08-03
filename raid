@@ -168,7 +168,7 @@ tasks = parse_markdown(a, signatures)
 format_blocks(tasks, signatures)
 
 max_name_size = 0
-tasks.keys.each do |name|
+tasks.each_key do |name|
   max_name_size = name.size if name.size > max_name_size
 end
 
