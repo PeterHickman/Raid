@@ -3,16 +3,16 @@
 
 # Inspired by https://github.com/egoist/maid
 
-RAIDFILE='Raidfile.md'
-FILENAME='/tmp/raid_workfile'
-SIGFILE='~/.raid_signatures'
+RAIDFILE = 'Raidfile.md'.freeze
+FILENAME = '/tmp/raid_workfile'.freeze
+SIGFILE = '~/.raid_signatures'.freeze
 
 signatures = {
   'bash'       => { 'shbang' => '#!/bin/sh',           'source' => 'default' },
   'sh'         => { 'shbang' => '#!/bin/sh',           'source' => 'default' },
   'ruby'       => { 'shbang' => '#!/usr/bin/env ruby', 'source' => 'default' },
   'js'         => { 'shbang' => '#!/usr/bin/env js',   'source' => 'default' },
-  'javascript' => { 'shbang' => '#!/usr/bin/env js',   'source' => 'default' },
+  'javascript' => { 'shbang' => '#!/usr/bin/env js',   'source' => 'default' }
 }
 
 def update_signatures(signatures)
@@ -73,10 +73,8 @@ def parse_markdown(text, signatures)
           exit(1)
         end
       end
-    else
-      if current_source
-        tasks[current_task]['block'] << line
-      end
+    elsif current_source
+      tasks[current_task]['block'] << line
     end
   end
 
@@ -84,7 +82,7 @@ def parse_markdown(text, signatures)
 end
 
 def format_blocks(tasks, signatures)
-  tasks.each do |task, data|
+  tasks.each do |_, data|
     data['description'] = data['description'].join(' ').gsub(/\s+/, ' ')
     data['block'] = assemble(signatures[data['source']]['shbang'], data['block'])
   end
@@ -126,7 +124,7 @@ requested_task = requested_task.downcase if requested_task
 fakeit = false
 
 if requested_task == '-c'
-  if File.exists?(RAIDFILE)
+  if File.exist?(RAIDFILE)
     puts "#{RAIDFILE} found"
   else
     puts "#{RAIDFILE} not in current directory"
@@ -145,10 +143,10 @@ elsif requested_task == '-s'
 
   keys = signatures.keys.sort
 
-  puts "%-15s %-30s %s" % ['source', 'shbang','loaded from']
-  puts "--------------- ------------------------------ ---------------"
+  puts '%-15s %-30s %s' % ['source', 'shbang','loaded from']
+  puts '--------------- ------------------------------ ---------------'
   keys.each do |k|
-    puts "%-15s %-30s %s" % [k, signatures[k]['shbang'], signatures[k]['source']]
+    puts '%-15s %-30s %s' % [k, signatures[k]['shbang'], signatures[k]['source']]
   end
 
   exit(0)
