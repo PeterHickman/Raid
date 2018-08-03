@@ -167,12 +167,12 @@ end
 tasks = parse_markdown(a, signatures)
 format_blocks(tasks, signatures)
 
-max_name_size = 0
-tasks.each_key do |name|
-  max_name_size = name.size if name.size > max_name_size
-end
-
 if requested_task.nil?
+  max_name_size = 0
+  tasks.each_key do |name|
+    max_name_size = name.size if name.size > max_name_size
+  end
+
   puts "raid %-#{max_name_size}s # %s" % ['-c', 'Show configuration']
   puts "raid %-#{max_name_size}s # %s" % ['-n ...', 'Show the actions that command would take']
   puts "raid %-#{max_name_size}s # %s" % ['-s', 'List all the recognised sources and shbangs']
