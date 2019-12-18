@@ -6,6 +6,8 @@ It uses `npm` to install. Not wanting to install a bazzilion unverified dependen
 
 And here we are
 
+PS. These is another similar, `Makefile` like, project called `run` which you could use instead that provides more explicit control of inputs etc. Go check out https://github.com/TekWizely/run
+
 ## Purpose
 
 Some of my everyday projects result in a ton of small scripts that are only related to the project but they fill up the directory and make it hard to find the real project files
